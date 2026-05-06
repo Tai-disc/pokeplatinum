@@ -81,7 +81,7 @@ void ov12_022346A4(BattleAnimSystem *battleAnimSys, SpriteSystem *spriteSys, Spr
     spriteTemplate.x = BattleAnimUtil_GetBattlerPos(battleAnimSys, attacker, BATTLE_ANIM_POSITION_MON_X);
     spriteTemplate.y = BattleAnimUtil_GetBattlerPos(battleAnimSys, attacker, BATTLE_ANIM_POSITION_MON_Y);
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < (int)NELEMS(v1->managedSprite); i++) {
         if (i == 0) {
             v1->managedSprite[i] = managedSprite;
             ManagedSprite_SetPositionXY(v1->managedSprite[i], spriteTemplate.x, spriteTemplate.y);
@@ -130,7 +130,7 @@ static void ov12_02234750(SysTask *task, void *param1)
         }
         break;
     case 4:
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < (int)NELEMS(v0->managedSprite); i++) {
             Sprite_DeleteAndFreeResources(v0->managedSprite[i]);
         }
 
@@ -156,12 +156,10 @@ static void ov12_0223483C(ManagedSprite *managedSprite, XYTransformContext *posC
 
 static BOOL ov12_0223489C(ManagedSprite *managedSprite, XYTransformContext *posCtx, XYTransformContext *scaleCtx)
 {
-    BOOL v0;
-
     PosLerpContext_UpdateAndApplyToSprite(posCtx, managedSprite);
-    v0 = ScaleLerpContext_UpdateAndApplyToSprite(scaleCtx, managedSprite);
+    BOOL isUpdated = ScaleLerpContext_UpdateAndApplyToSprite(scaleCtx, managedSprite);
 
-    if (v0) {
+    if (isUpdated) {
         return 0;
     }
 
@@ -311,18 +309,18 @@ static void ov12_02234B64(SysTask *task, void *param1)
 
     switch (v0->frameCount) {
     case 0:
-        BOOL v2;
+        BOOL isUpdated;
 
-        for (i = 0; i < 6; i++) {
-            v2 = ov12_02234B34(v0->managedSprite[i], &v0->unk_24[i], &v0->unk_3C[i]);
+        for (i = 0; i < (int)NELEMS(v0->managedSprite); i++) {
+            isUpdated = ov12_02234B34(v0->managedSprite[i], &v0->unk_24[i], &v0->unk_3C[i]);
         }
 
-        if (v2) {
+        if (isUpdated) {
             v0->frameCount++;
         }
         break;
     case 1:
-        for (i = 0; i < 6; i++) {
+        for (i = 0; i < (int)NELEMS(v0->managedSprite); i++) {
             Sprite_DeleteAndFreeResources(v0->managedSprite[i]);
         }
 
@@ -338,7 +336,7 @@ static void ov12_02234BD8(UnkStruct_ov12_02234BD8 *param0, int param1)
 {
     int v1 = 360 * 0xffff / 360 / 6;
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < (int)NELEMS(param0->managedSprite); i++) {
         RevolutionContext_Init(&param0->transformCtx[i], 0 * 0xffff / 360, 180 * 0xffff / 360, 0, 0, FX32_ONE * 50, 0, 48);
         param0->transformCtx[i].data[1] += v1 * i;
         param0->transformCtx[i].data[5] *= param1;
@@ -347,7 +345,7 @@ static void ov12_02234BD8(UnkStruct_ov12_02234BD8 *param0, int param1)
 
 static void ov12_02234C30(UnkStruct_ov12_02234BD8 *param0)
 {
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < (int)NELEMS(param0->managedSprite); i++) {
         RevolutionContext_Update(&param0->transformCtx[i]);
 
         ManagedSprite_SetPositionXY(param0->managedSprite[i], param0->posX + param0->transformCtx[i].x, param0->posY);
@@ -397,7 +395,7 @@ static void ov12_02234CA8(SysTask *task, void *param1)
         }
         break;
     case 4:
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < (int)NELEMS(v0->managedSprite); i++) {
             Sprite_DeleteAndFreeResources(v0->managedSprite[i]);
         }
 
@@ -426,7 +424,7 @@ void ov12_02234D98(BattleAnimSystem *battleAnimSystem, SpriteSystem *spriteSyste
 
     spriteTemplate = BattleAnimSystem_GetLastSpriteTemplate(battleAnimSystem);
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < (int)NELEMS(battleAnimUtil->managedSprite); i++) {
         if (i == 0) {
             battleAnimUtil->managedSprite[i] = managedSprite;
         } else {
