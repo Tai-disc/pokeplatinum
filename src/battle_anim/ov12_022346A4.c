@@ -15,7 +15,7 @@
 
 typedef struct {
     BattleAnimSystem *battleAnimSys;
-    int frameCount;
+    int state;
     int unk_08;
     SpriteManager *spriteMan;
     int unk_10;
@@ -26,7 +26,7 @@ typedef struct {
 
 typedef struct {
     BattleAnimSystem *battleAnimSys;
-    int frameCount;
+    int state;
     int explicitOffset;
     SpriteManager *spriteMan;
     ManagedSprite *managedSprite;
@@ -35,7 +35,7 @@ typedef struct {
 
 typedef struct {
     BattleAnimSystem *battleAnimSys;
-    int frameCount;
+    int state;
     SpriteManager *spriteMan;
     ManagedSprite *managedSprite[6];
     int unk_24[6];
@@ -46,7 +46,7 @@ typedef struct {
     BattleAnimSystem *battleAnimSys;
     SpriteSystem *spriteSys;
     SpriteManager *spriteMan;
-    int frameCount;
+    int state;
     int unk_10;
     int unk_14;
     ManagedSprite *managedSprite[6];
@@ -101,11 +101,11 @@ static void ov12_02234750(SysTask *task, void *param1)
 {
     UnkStruct_ov12_022346A4 *v0 = param1;
 
-    switch (v0->frameCount) {
+    switch (v0->state) {
     case 0:
         ov12_0223483C(v0->managedSprite[0], &v0->posCtx[0], &v0->scaleCtx[0], v0->unk_10);
         ov12_0223489C(v0->managedSprite[0], &v0->posCtx[0], &v0->scaleCtx[0]);
-        v0->frameCount++;
+        v0->state++;
         v0->unk_08 = 8;
         break;
     case 1:
@@ -113,20 +113,20 @@ static void ov12_02234750(SysTask *task, void *param1)
         ov12_0223489C(v0->managedSprite[0], &v0->posCtx[0], &v0->scaleCtx[0]);
 
         if (v0->unk_08 < 0) {
-            v0->frameCount++;
+            v0->state++;
         }
         break;
     case 2:
         ov12_0223483C(v0->managedSprite[1], &v0->posCtx[1], &v0->scaleCtx[1], v0->unk_10);
         ov12_0223489C(v0->managedSprite[1], &v0->posCtx[1], &v0->scaleCtx[1]);
         ov12_0223489C(v0->managedSprite[0], &v0->posCtx[0], &v0->scaleCtx[0]);
-        v0->frameCount++;
+        v0->state++;
         break;
     case 3:
         ov12_0223489C(v0->managedSprite[0], &v0->posCtx[0], &v0->scaleCtx[0]);
 
         if (ov12_0223489C(v0->managedSprite[1], &v0->posCtx[1], &v0->scaleCtx[1])) {
-            v0->frameCount++;
+            v0->state++;
         }
         break;
     case 4:
@@ -190,16 +190,16 @@ static void ov12_02234918(SysTask *task, void *param1)
     UnkStruct_ov12_022348C8 *v0 = param1;
     int v1;
 
-    switch (v0->frameCount) {
+    switch (v0->state) {
     case 0:
         AlphaFadeContext_Init(&v0->alphaFadeCtx, 0, 16, 20 - 0, 20 - 16, 10);
         ManagedSprite_SetDrawFlag(v0->managedSprite, TRUE);
         BattleAnimUtil_SetSpriteBgBlending(v0->battleAnimSys, 0, 20 - 0);
-        v0->frameCount++;
+        v0->state++;
         break;
     case 1:
         if (AlphaFadeContext_IsDone(&v0->alphaFadeCtx)) {
-            v0->frameCount++;
+            v0->state++;
 
             ManagedSprite_SetAnimateFlag(v0->managedSprite, TRUE);
             ManagedSprite_SetAnimationSpeed(v0->managedSprite, FX32_ONE);
@@ -211,14 +211,14 @@ static void ov12_02234918(SysTask *task, void *param1)
 
         ManagedSprite_SetExplicitPaletteOffset(v0->managedSprite, v0->explicitOffset + v1);
 
-        if (ManagedSprite_IsAnimated(v0->managedSprite) == FALSE) {
-            v0->frameCount++;
+        if (!ManagedSprite_IsAnimated(v0->managedSprite)) {
+            v0->state++;
             AlphaFadeContext_Init(&v0->alphaFadeCtx, 16, 0, 20 - 16, 20 - 0, 8);
         }
         break;
     case 3:
         if (AlphaFadeContext_IsDone(&v0->alphaFadeCtx)) {
-            v0->frameCount++;
+            v0->state++;
             ManagedSprite_SetDrawFlag(v0->managedSprite, FALSE);
         }
         break;
@@ -247,8 +247,8 @@ void ov12_02234A10(BattleAnimSystem *battleAnimSys, SpriteSystem *spriteSys, Spr
     spriteTemplate.x = BattleAnimUtil_GetBattlerPos(battleAnimSys, attacker, 0);
     spriteTemplate.y = BattleAnimUtil_GetBattlerPos(battleAnimSys, attacker, 1);
 
-    for (int i = 6 - 1; i >= 0; i--) {
-        if (i == 6 - 1) {
+    for (int i = NELEMS(battleAnimUtil->managedSprite) - 1; i >= 0; i--) {
+        if (i == NELEMS(battleAnimUtil->managedSprite) - 1) {
             battleAnimUtil->managedSprite[i] = managedSprite;
             ManagedSprite_SetPositionXY(managedSprite, spriteTemplate.x, spriteTemplate.y);
         } else {
@@ -307,7 +307,7 @@ static void ov12_02234B64(SysTask *task, void *param1)
     UnkStruct_ov12_02234A10 *v0 = param1;
     int i;
 
-    switch (v0->frameCount) {
+    switch (v0->state) {
     case 0:
         BOOL isUpdated;
 
@@ -316,7 +316,7 @@ static void ov12_02234B64(SysTask *task, void *param1)
         }
 
         if (isUpdated) {
-            v0->frameCount++;
+            v0->state++;
         }
         break;
     case 1:
@@ -337,7 +337,7 @@ static void ov12_02234BD8(UnkStruct_ov12_02234BD8 *param0, int param1)
     int v1 = 360 * 0xffff / 360 / 6;
 
     for (int i = 0; i < (int)NELEMS(param0->managedSprite); i++) {
-        RevolutionContext_Init(&param0->transformCtx[i], 0 * 0xffff / 360, 180 * 0xffff / 360, 0, 0, FX32_ONE * 50, 0, 48);
+        RevolutionContext_Init(&param0->transformCtx[i], DEG_TO_IDX(0), DEG_TO_IDX(180), 0, 0, FX32_ONE * 50, 0, 48);
         param0->transformCtx[i].data[1] += v1 * i;
         param0->transformCtx[i].data[5] *= param1;
     }
@@ -350,7 +350,7 @@ static void ov12_02234C30(UnkStruct_ov12_02234BD8 *param0)
 
         ManagedSprite_SetPositionXY(param0->managedSprite[i], param0->posX + param0->transformCtx[i].x, param0->posY);
 
-        if (param0->transformCtx[i].data[1] >= 90 * 0xffff / 360 && param0->transformCtx[i].data[1] <= 269 * 0xffff / 360) {
+        if (param0->transformCtx[i].data[1] >= DEG_TO_IDX(90) && param0->transformCtx[i].data[1] <= DEG_TO_IDX(269)) {
             ManagedSprite_SetExplicitPriority(param0->managedSprite[i], 1);
         } else {
             ManagedSprite_SetExplicitPriority(param0->managedSprite[i], BattleAnimSystem_GetPokemonSpritePriority(param0->battleAnimSys) + 1);
@@ -362,19 +362,19 @@ static void ov12_02234CA8(SysTask *task, void *param1)
 {
     UnkStruct_ov12_02234BD8 *v0 = param1;
 
-    switch (v0->frameCount) {
+    switch (v0->state) {
     case 0:
         BattleAnimUtil_SetSpriteBgBlending(v0->battleAnimSys, 1, 16 - 1);
         AlphaFadeContext_Init(&v0->alphaFadeCtx, 1, 16, 16 - 1, 16 - 16, 10);
         ov12_02234BD8(v0, v0->unk_14);
         ov12_02234C30(v0);
-        v0->frameCount++;
+        v0->state++;
         break;
     case 1:
         ov12_02234C30(v0);
 
         if (AlphaFadeContext_IsDone(&v0->alphaFadeCtx)) {
-            v0->frameCount++;
+            v0->state++;
             v0->unk_10 = 48 - 10 * 2;
         }
         break;
@@ -383,7 +383,7 @@ static void ov12_02234CA8(SysTask *task, void *param1)
         v0->unk_10--;
 
         if (v0->unk_10 < 0) {
-            v0->frameCount++;
+            v0->state++;
             AlphaFadeContext_Init(&v0->alphaFadeCtx, 16, 1, 16 - 16, 16 - 1, 10);
         }
         break;
@@ -391,7 +391,7 @@ static void ov12_02234CA8(SysTask *task, void *param1)
         ov12_02234C30(v0);
 
         if (AlphaFadeContext_IsDone(&v0->alphaFadeCtx)) {
-            v0->frameCount++;
+            v0->state++;
         }
         break;
     case 4:
